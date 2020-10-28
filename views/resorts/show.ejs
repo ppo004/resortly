@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>
+            Home Page
+        </title>
+    </head>
+    <body>
+        <h3><%=data.title %></h3>
+        <h5><%=data.location%> </h5>
+        <%=data.description%> 
+        <footer>
+            <a href="/resorts">Back</a>
+            <a href="/resorts/<%=data._id %>/edit ">Edit</a>
+            <form action="/resorts/<%= data._id %>?_method=DELETE" method="POST">
+                <button>Delete</button>
+            </form>
+        </footer>
+    </body>
+</html>

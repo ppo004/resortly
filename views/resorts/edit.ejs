@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>
+            New resort
+        </title>
+    </head>
+    <body>
+        <form action="/resorts/<%= data._id %>?_method=PUT" method="POST">
+        <div>
+            <label for="title">Title</label>
+            <input value="<%= data.title %> " type="text" name="resorts[title]" id="title">
+        </div>
+        <div>
+            <label for="location">Location</label>
+            <input value="<%= data.location %> " type="text" name="resorts[location]" id="location">
+        </div>
+        <button>Update</button>
+        </form>
+        <footer>
+            <a href="/resorts/<%=data._id %> ">Back</a>
+        </footer>
+    </body>
+</html>
