@@ -1,11 +1,21 @@
 <% layout('./boilerplate') %> 
-        <h3><%=data.title %></h3>
-        <h5><%=data.location%> </h5>
-        <%=data.description%> 
-        <footer>
-            <a href="/resorts">Back</a>
-            <a href="/resorts/<%=data._id %>/edit ">Edit</a>
-            <form action="/resorts/<%= data._id %>?_method=DELETE" method="POST">
-                <button>Delete</button>
+
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <h3 class="card-title"><%= data.title%></h3>
+                <p class="card-text"><%= data.description%></p>
+            </div>
+            <img  class="card-img-top" src="<%= data.image%>" class="d-block w-100" alt="">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item text-muted"><%= data.location%></li>
+                <li class="list-group-item">₹ <%= data.price%> /night</li>
+            </ul>
+            <div class="card-body">
+            <a class="btn btn-primary card-link" href="/resorts">Back</a>
+            <a class="btn btn-primary card-link" href="/resorts/<%=data._id %>/edit ">Edit</a>
+            <form class="d-inline" action="/resorts/<%= data._id %>?_method=DELETE" method="POST">
+                <button class="btn btn-danger">Delete</button>
             </form>
-        </footer>
+        </div>
+        </div>

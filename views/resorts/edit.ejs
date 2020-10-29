@@ -1,15 +1,63 @@
-<% layout('./boilerplate') %> 
+<% layout('./boilerplate') %>
+<div class="row">
+    <h1 class="text-center">Edit this resort</h1>
+    
+    <div class="col-md-6 offset-md-3">
         <form action="/resorts/<%= data._id %>?_method=PUT" method="POST">
-        <div>
-            <label for="title">Title</label>
-            <input value="<%= data.title %> " type="text" name="resorts[title]" id="title">
-        </div>
-        <div>
-            <label for="location">Location</label>
-            <input value="<%= data.location %> " type="text" name="resorts[location]" id="location">
-        </div>
-        <button>Update</button>
+            <div class="mb-3">
+                <label class="form-label" for="title">Title</label>
+                <input class="form-control" value="<%= data.title %>" type="text" id="title" name="resorts[title]" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="location">Location</label>
+                <input value="<%= data.location %>" class="form-control" type="text" id="location" name="resorts[location]" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="image">Image Url</label>
+                <input value="<%= data.image %>" class="form-control" type="text" id="image" name="resorts[image]" required>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="price">Campground Price</label>
+                <div class="input-group">
+                    <span class="input-group-text" id="price-label">₹</span>
+                    <input value="<%= data.price %>" type="text" class="form-control" id="price" placeholder="0.00" aria-label="price"
+                        aria-describedby="price-label" name="resorts[price]" required>
+                </div>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="description">Description</label>
+                <textarea class="form-control" type="text" id="description" name="resorts[description]"
+                    required> <%= data.description %> </textarea>
+                <div class="valid-feedback">
+                    Looks good!
+                </div>
+            </div>
+            <!-- <div class="mb-3">
+                <div class="form-file custom-file">
+                    <input type="file" class="form-file-input" id="image" name="resorts[image]" multiple>
+                    <label class="form-file-label" for="image">
+                        <span class="form-file-text custom-file-label">Choose image(s)...</span>
+                        <span class="form-file-button">Browse</span>
+                    </label>
+                </div>
+            </div> -->
+            <div class="mb-3">
+                <button class="btn btn-success">Edit Resort</button>
+            </div>
         </form>
-        <footer>
-            <a href="/resorts/<%=data._id %> ">Back</a>
-        </footer>
+        </div>
+     </div>

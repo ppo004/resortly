@@ -44,7 +44,7 @@ app.get("/resorts/:id/edit",async (req,res)=>{
     res.render("resorts/edit",{data:resorts}); 
 });
 app.put("/resorts/:id",async(req,res)=>{
-   const resort = await Resort.findByIdAndUpdate(req.params.id,{title:req.body.resorts.title,location:req.body.resorts.location});
+   const resort = await Resort.findByIdAndUpdate(req.params.id,{title:req.body.resorts.title,location:req.body.resorts.location,description:req.body.resorts.description,image:req.body.resorts.image,price:req.body.resorts.price});
     res.redirect(`/resorts/${resort._id}`);
 })
 app.delete("/resorts/:id",async(req,res)=>{

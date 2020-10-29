@@ -20,6 +20,17 @@ const location = [
     "123 Ibnivalavadi Village, Boikeri, 571201 Madikeri, India",
     " Thaikappa Estates, Post Box No. 4, Horoor Post, Suntikoppa, North Coorg, 571327 Suntikoppa, India"
 ];
+const images = [
+    "https://cf.bstatic.com/images/hotel/max1024x768/885/88538194.jpg",
+    "https://cf.bstatic.com/images/hotel/max1024x768/270/270441351.jpg",
+    "https://cf.bstatic.com/images/hotel/max1024x768/421/42190775.jpg",
+    "https://cf.bstatic.com/images/hotel/max1024x768/969/96963125.jpg",
+    "https://cf.bstatic.com/images/hotel/max1024x768/818/81880585.jpg",
+    "https://cf.bstatic.com/images/hotel/max1024x768/255/255911356.jpg",
+    "https://cf.bstatic.com/images/hotel/max1024x768/248/248267353.jpg",
+    "https://cf.bstatic.com/images/hotel/max1024x768/238/238711827.jpg",
+    "https://cf.bstatic.com/images/hotel/max1024x768/213/213617156.jpg",
+]
 const description = [
     "Get the celebrity treatment with world-class service at Taj Madikeri Resort & Spa Coorg",
     "Coorg Wilderness Resort in Madikeri has 5-star accommodation with a fitness centre and a bar.",
@@ -45,7 +56,7 @@ const seed = async (nam,loc,desc)=>{
     await Resort.deleteMany({});
     let resort;
     for(let i=0;i<nam.length;i++){
-        resort = new Resort({title:nam[i],description:desc[i],location:loc[i],price:12000});
+        resort = new Resort({title:nam[i],description:desc[i],location:loc[i],price:Math.floor(Math.random() * 10000),image:images[i]});
         await resort.save();
         console.log(resort);
     }
