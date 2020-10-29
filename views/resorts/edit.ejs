@@ -1,10 +1,4 @@
-<html>
-    <head>
-        <title>
-            New resort
-        </title>
-    </head>
-    <body>
+<% layout('./boilerplate') %> 
         <form action="/resorts/<%= data._id %>?_method=PUT" method="POST">
         <div>
             <label for="title">Title</label>
@@ -19,5 +13,3 @@
         <footer>
             <a href="/resorts/<%=data._id %> ">Back</a>
         </footer>
-    </body>
-</html>

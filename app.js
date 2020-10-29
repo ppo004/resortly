@@ -5,6 +5,7 @@ const morgan        = require("morgan");
 const mongoose      = require("mongoose");
 const override      = require("method-override"); 
 const Resort        = require("./modules/resort");
+const ejs_engine    = require("ejs-mate");
 // const {names , locations , descriptions} = require("./seed");
 mongoose.connect('mongodb://localhost:27017/resortly',{useNewUrlParser:true,useCreateIndex:true,useUnifiedTopology:true}).then(()=>{
     console.log("CONNECTION TO RESORTLY OPEN!!!");
@@ -12,10 +13,12 @@ mongoose.connect('mongodb://localhost:27017/resortly',{useNewUrlParser:true,useC
     console.log(err);
 })
 app.set("view engine","ejs");
+app.engine('ejs',ejs_engine);
 app.set("views",path.join(__dirname,'views'));
 app.use(express.urlencoded({extended:true}));
 app.use(override('_method'));
 app.use(morgan('tiny'));
+
 app.get("/",(req,res)=>{
     res.send("<h1>Wilkommen</h1>");
 })
@@ -25,7 +28,7 @@ app.get("/resorts",async (req,res)=>{
 });
 app.get("/resorts/new",(req,res)=>{
     res.render("resorts/new")
-})
+}) 
 app.post("/resorts",async(req,res)=>{
     const submittedData = req.body.resorts;
     const resort = new Resort(submittedData);
@@ -47,6 +50,9 @@ app.put("/resorts/:id",async(req,res)=>{
 app.delete("/resorts/:id",async(req,res)=>{
     const resort = await Resort.findByIdAndDelete(req.params.id);
     res.redirect("/resorts");
+})
+app.use((req,res)=>{
+    res.status(404).send("<h1>Error</h1>")
 })
 app.listen(3000,()=>{
     console.log("Resorts app starting on port 3000")

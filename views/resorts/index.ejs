@@ -1,10 +1,4 @@
-<html>
-    <head>
-        <title>
-            Home Page
-        </title>
-    </head>
-    <body>
+<% layout('./boilerplate') %> 
         <h1>All Resorts</h1>
         <div><a href="/resorts/new">Add new</a></div>
         <ul>
@@ -12,5 +6,3 @@
                 <a href="/resorts/<%=resort._id%> "><li><%= resort.title %> </li> </a>
             <% } %> 
         </ul>
-    </body>
-</html>

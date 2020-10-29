@@ -1,10 +1,4 @@
-<html>
-    <head>
-        <title>
-            Home Page
-        </title>
-    </head>
-    <body>
+<% layout('./boilerplate') %> 
         <h3><%=data.title %></h3>
         <h5><%=data.location%> </h5>
         <%=data.description%> 
@@ -15,5 +9,3 @@
                 <button>Delete</button>
             </form>
         </footer>
-    </body>
-</html>
