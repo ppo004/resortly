@@ -3,7 +3,7 @@
     <h1 class="text-center">Edit this resort</h1>
     
     <div class="col-md-6 offset-md-3">
-        <form action="/resorts/<%= data._id %>?_method=PUT" method="POST">
+        <form action="/resorts/<%= data._id %>?_method=PUT" method="POST" novalidate class="needs-validation">
             <div class="mb-3">
                 <label class="form-label" for="title">Title</label>
                 <input class="form-control" value="<%= data.title %>" type="text" id="title" name="resorts[title]" required>
