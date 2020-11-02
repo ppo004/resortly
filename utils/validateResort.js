@@ -21,3 +21,6 @@ else{
 }
 }
 module.exports = validateResort;
+
+
+

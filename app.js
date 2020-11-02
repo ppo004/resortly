@@ -1,14 +1,20 @@
-const express           = require("express");
-const path              = require("path");
-const app               = express();
-const morgan            = require("morgan");
-const mongoose          = require("mongoose");
-const override          = require("method-override"); 
-const Resort            = require("./modules/resort");
-const ejs_engine        = require("ejs-mate");
-const catchAsync        = require("./utils/catchAsync");
-const ExpressError      = require("./utils/expressErrors");
-const validateResort    = require("./utils/validateResort");
+const express                            = require("express");
+const path                               = require("path");
+const app                                = express();
+const morgan                             = require("morgan");
+const mongoose                           = require("mongoose");
+const override                           = require("method-override"); 
+const ejs_engine                         = require("ejs-mate");
+const Joi                                = require("joi");
+
+const Review                             = require("./modules/review");
+const Resort                             = require("./modules/resort");
+const catchAsync                         = require("./utils/catchAsync");
+const ExpressError                       = require("./utils/expressErrors");
+const review = require("./modules/review");
+// const validateResort                     = require("./utils/validateResort");
+// const validateReview                     = require("./utils/validateReview")
+
 
 mongoose.connect('mongodb://localhost:27017/resortly',{useNewUrlParser:true,useCreateIndex:true,useUnifiedTopology:true}).then(()=>{
     console.log("CONNECTION TO RESORTLY OPEN!!!");
@@ -21,6 +27,47 @@ app.set("views",path.join(__dirname,'views'));
 app.use(express.urlencoded({extended:true}));
 app.use(override('_method'));
 app.use(morgan('tiny'));
+
+
+const validateReview = (req,res,next)=>{
+    const schemaReview = Joi.object({
+        review:Joi.object({
+            rating: Joi.number().required(),
+            body:Joi.string().required()
+        })
+    }).required()
+    const {error} = schemaReview.validate(req.body);
+    if(error){
+        const msg = error.details.map(el => el.message).join(',');
+    throw new ExpressError(msg,400)
+    }
+    else{
+        next();
+    }
+}
+
+
+const validateResort = (req,res,next)=>{
+    const resortSchema = Joi.object({
+        resorts:Joi.object({
+            title:Joi.string().required(),
+            price:Joi.number().required().min(1000),
+            description:Joi.string().required(),
+            image:Joi.string().required(),
+            location:Joi.string().required()
+        }).required()
+    });
+const {error} = resortSchema.validate(req.body);
+console.log(error);
+if(error){
+    const msg = error.details.map(el => el.message).join(',');
+    throw new ExpressError(msg,400)
+}
+else{
+    next();
+}
+}
+
 
 app.get("/",(req,res)=>{
     res.send("<h1>Wilkommen</h1>");
@@ -40,7 +87,13 @@ app.post("/resorts",validateResort,catchAsync(async(req,res,next)=>{
 }));
 app.get("/resorts/:id",catchAsync(async (req,res)=>{
     const resorts = await Resort.findById(req.params.id);
-        res.render("resorts/show",{data:resorts});
+    let reviewsCollected = [];
+    for(let y of resorts.reviews){
+        let x = await Review.findById(y);
+        reviewsCollected.push(x);
+    }
+    console.log(reviewsCollected)
+        res.render("resorts/show",{data:resorts,reviews:reviewsCollected});
 }));
 app.get("/resorts/:id/edit",catchAsync(async (req,res)=>{
     const resorts = await Resort.findById(req.params.id);
@@ -53,6 +106,21 @@ app.put("/resorts/:id",validateResort,catchAsync(async(req,res)=>{
 app.delete("/resorts/:id",catchAsync(async(req,res)=>{
     const resort = await Resort.findByIdAndDelete(req.params.id);
     res.redirect("/resorts");
+}))
+app.post("/resorts/:id/reviews",validateReview,async (req,res)=>{
+    const resort = await Resort.findById(req.params.id);
+    const reviews = new Review(req.body.review);
+    resort.reviews.push(reviews);
+    await reviews.save();
+    await resort.save();
+    console.log(reviews);
+    res.redirect(`/resorts/${req.params.id}`);
+})
+app.delete("/resorts/:id/review/:reviewID",catchAsync(async (req,res)=>{
+    const {id,reviewID} = req.params;
+    const resort = await Resort.findByIdAndUpdate(id,{$pull:{reviews:reviewID}});
+    const review = await Review.findByIdAndDelete(reviewID);
+    res.redirect(`/resorts/${id}`);
 }))
 app.all("*",(req,res,next)=>{
     next(new ExpressError('Page not found',404));
