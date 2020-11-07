@@ -6,13 +6,15 @@ const morgan                             = require("morgan");
 const mongoose                           = require("mongoose");
 const override                           = require("method-override"); 
 const ejs_engine                         = require("ejs-mate");
+const session                            = require("express-session");
+const flash                              = require("connect-flash");
 /*----------------------------------MODULES IMPORTS----------------------------------*/
 const ExpressError                       = require("./utils/expressErrors");
 /*----------------------------------ROUTES IMPORTS----------------------------------*/
 const resorts                            = require("./routes/resorts");
 const reviews                            = require("./routes/reviews");
 /*----------------------------------MONGOOSE CONNECTION----------------------------------*/
-mongoose.connect('mongodb://localhost:27017/resortly',{useNewUrlParser:true,useCreateIndex:true,useUnifiedTopology:true}).then(()=>{
+mongoose.connect('mongodb://localhost:27017/resortly',{useNewUrlParser:true,useCreateIndex:true,useUnifiedTopology:true,useFindAndModify:false}).then(()=>{
     console.log("CONNECTION TO RESORTLY OPEN!!!");
 }).catch((err)=>{
     console.log(err);
@@ -25,6 +27,24 @@ app.set("views",path.join(__dirname,'views')); // to run app.js outside the dire
 app.use(express.urlencoded({extended:true})); // used for body parsing
 app.use(override('_method')); // to use patch, delete through post requests
 app.use(morgan('tiny')); // debugging middleware
+app.use(express.static(path.join(__dirname,'public')));
+const sessionConfig = {
+    secret: 'tobechangedsoon',
+    resave:false,
+    saveUninitialized:true,
+    cookie:{
+        httpOnly:true,
+        expires:Date.now()+1000*3600*24*7,
+        maxAge:1000*3600*24*7
+    }
+};
+app.use(session(sessionConfig));
+app.use(flash());
+app.use((req,res,next)=>{
+    res.locals.success = req.flash("success");
+    res.locals.error   = req.flash("error");
+    next();
+});
 /*----------------------------------ROUTES----------------------------------*/
 app.use("/resorts",resorts);
 app.use("/resorts/:id/reviews",reviews);

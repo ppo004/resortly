@@ -4,6 +4,7 @@ const catchAsync    = require("../utils/catchAsync");
 const Resort        = require("../modules/resort");
 const Joi           = require("joi");
 const Review        = require("../modules/review");
+const ExpressError  = require("../utils/expressErrors");
 
 const validateReview = (req,res,next)=>{
     const schemaReview = Joi.object({
@@ -29,12 +30,14 @@ router.post("/",validateReview,async (req,res)=>{
     await reviews.save();
     await resort.save();
     console.log(reviews);
+    req.flash('success',`Added review`);
     res.redirect(`/resorts/${req.params.id}`);
 })
 router.delete("/:reviewID",catchAsync(async (req,res)=>{
     const {id,reviewID} = req.params;
     const resort = await Resort.findByIdAndUpdate(id,{$pull:{reviews:reviewID}});
     const review = await Review.findByIdAndDelete(reviewID);
+    req.flash('success',`Deleted review`);
     res.redirect(`/resorts/${id}`);
 }))
 module.exports = router;
