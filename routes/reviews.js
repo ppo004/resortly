@@ -5,6 +5,7 @@ const Resort        = require("../modules/resort");
 const Joi           = require("joi");
 const Review        = require("../modules/review");
 const ExpressError  = require("../utils/expressErrors");
+const isLoggedIn    = require("../isLoggedinMiddleware");
 
 const validateReview = (req,res,next)=>{
     const schemaReview = Joi.object({
@@ -23,7 +24,7 @@ const validateReview = (req,res,next)=>{
     }
 }
 
-router.post("/",validateReview,async (req,res)=>{
+router.post("/",isLoggedIn, validateReview,async (req,res)=>{
     const resort = await Resort.findById(req.params.id);
     const reviews = new Review(req.body.review);
     resort.reviews.push(reviews);
@@ -33,7 +34,7 @@ router.post("/",validateReview,async (req,res)=>{
     req.flash('success',`Added review`);
     res.redirect(`/resorts/${req.params.id}`);
 })
-router.delete("/:reviewID",catchAsync(async (req,res)=>{
+router.delete("/:reviewID",isLoggedIn, catchAsync(async (req,res)=>{
     const {id,reviewID} = req.params;
     const resort = await Resort.findByIdAndUpdate(id,{$pull:{reviews:reviewID}});
     const review = await Review.findByIdAndDelete(reviewID);

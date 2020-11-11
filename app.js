@@ -8,11 +8,15 @@ const override                           = require("method-override");
 const ejs_engine                         = require("ejs-mate");
 const session                            = require("express-session");
 const flash                              = require("connect-flash");
+const passport                           = require("passport");
+const passportLocal                      = require("passport-local");
+const User                               = require("./modules/user");
 /*----------------------------------MODULES IMPORTS----------------------------------*/
 const ExpressError                       = require("./utils/expressErrors");
 /*----------------------------------ROUTES IMPORTS----------------------------------*/
-const resorts                            = require("./routes/resorts");
-const reviews                            = require("./routes/reviews");
+const resortsRoutes                      = require("./routes/resorts");
+const reviewsRoutes                      = require("./routes/reviews");
+const userRoutes                         = require("./routes/user")
 /*----------------------------------MONGOOSE CONNECTION----------------------------------*/
 mongoose.connect('mongodb://localhost:27017/resortly',{useNewUrlParser:true,useCreateIndex:true,useUnifiedTopology:true,useFindAndModify:false}).then(()=>{
     console.log("CONNECTION TO RESORTLY OPEN!!!");
@@ -45,9 +49,23 @@ app.use((req,res,next)=>{
     res.locals.error   = req.flash("error");
     next();
 });
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new passportLocal(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 /*----------------------------------ROUTES----------------------------------*/
-app.use("/resorts",resorts);
-app.use("/resorts/:id/reviews",reviews);
+app.get('/fakeUser',async(req,res)=>{
+    const user = new User({
+        email:"prajwalshiv.04@gmail.com",
+        username:"ppo"
+    });
+    const newUser = await User.register(user,'p0nn1@123');
+    res.send(newUser);
+})
+app.use("/resorts",resortsRoutes);
+app.use("/resorts/:id/reviews",reviewsRoutes);
+app.use("/",userRoutes);
 app.get("/",(req,res)=>{
     res.send("<h1>Wilkommen</h1>");
 })
