@@ -30,7 +30,7 @@ app.set("views",path.join(__dirname,'views')); // to run app.js outside the dire
 /*----------------------------------MIDDLEWARES----------------------------------*/
 app.use(express.urlencoded({extended:true})); // used for body parsing
 app.use(override('_method')); // to use patch, delete through post requests
-app.use(morgan('tiny')); // debugging middleware
+// app.use(morgan('tiny')); // debugging middleware
 app.use(express.static(path.join(__dirname,'public')));
 const sessionConfig = {
     secret: 'tobechangedsoon',
@@ -44,25 +44,19 @@ const sessionConfig = {
 };
 app.use(session(sessionConfig));
 app.use(flash());
-app.use((req,res,next)=>{
-    res.locals.success = req.flash("success");
-    res.locals.error   = req.flash("error");
-    next();
-});
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new passportLocal(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+app.use((req,res,next)=>{
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash("success");
+    res.locals.error   = req.flash("error");
+    res.cookie("count",0);
+    next();
+});
 /*----------------------------------ROUTES----------------------------------*/
-app.get('/fakeUser',async(req,res)=>{
-    const user = new User({
-        email:"prajwalshiv.04@gmail.com",
-        username:"ppo"
-    });
-    const newUser = await User.register(user,'p0nn1@123');
-    res.send(newUser);
-})
 app.use("/resorts",resortsRoutes);
 app.use("/resorts/:id/reviews",reviewsRoutes);
 app.use("/",userRoutes);

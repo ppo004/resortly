@@ -56,7 +56,7 @@ const seed = async (nam,loc,desc)=>{
     await Resort.deleteMany({});
     let resort;
     for(let i=0;i<nam.length;i++){
-        resort = new Resort({title:nam[i],description:desc[i],location:loc[i],price:Math.floor(Math.random() * 10000),image:images[i],reviews:[]});
+        resort = new Resort({title:nam[i],description:desc[i],location:loc[i],price:Math.floor(Math.random() * 10000),image:images[i],reviews:[],author:"5fab4eb9d6f0bd287db2cf48"});
         await resort.save();
         console.log(resort);
     }

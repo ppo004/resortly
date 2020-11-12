@@ -27,6 +27,7 @@ const validateReview = (req,res,next)=>{
 router.post("/",isLoggedIn, validateReview,async (req,res)=>{
     const resort = await Resort.findById(req.params.id);
     const reviews = new Review(req.body.review);
+    reviews.author = req.user._id;
     resort.reviews.push(reviews);
     await reviews.save();
     await resort.save();
@@ -36,9 +37,17 @@ router.post("/",isLoggedIn, validateReview,async (req,res)=>{
 })
 router.delete("/:reviewID",isLoggedIn, catchAsync(async (req,res)=>{
     const {id,reviewID} = req.params;
-    const resort = await Resort.findByIdAndUpdate(id,{$pull:{reviews:reviewID}});
-    const review = await Review.findByIdAndDelete(reviewID);
-    req.flash('success',`Deleted review`);
-    res.redirect(`/resorts/${id}`);
+    const currentUser = req.user._id;
+    const rev = await Review.findById(reviewID);
+    if(!currentUser.equals(rev.author)){
+        req.flash("error","You are not allowed to do that");
+        res.redirect(`/resorts/${id}`);
+    }
+    else{
+        const resort = await Resort.findByIdAndUpdate(id,{$pull:{reviews:reviewID}});
+        const review = await Review.findByIdAndDelete(reviewID);
+        req.flash('success',`Deleted review`);
+        res.redirect(`/resorts/${id}`);
+    }
 }))
 module.exports = router;

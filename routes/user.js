@@ -8,12 +8,14 @@ router.get("/register",(req,res)=>{
 });
 router.post("/register",async(req,res)=>{
     try{
-        const {username,password,email} = req.body;
+        const {firstname,lastname,username,password,email} = req.body;
         const user = new User({
             email,
-            username
+            username,
+            firstname,lastname
         });
         const newUser = await User.register(user,password);
+        console.log(newUser);
         req.logIn(newUser,err=>{
             if(err) return next(err);
             req.flash('success',`${user.username} registered`);

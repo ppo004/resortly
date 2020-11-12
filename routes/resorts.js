@@ -37,6 +37,7 @@ router.post("/",isLoggedIn, validateResort,async(req,res,next)=>{
     try{
     const submittedData = req.body.resorts;
     const resort = new Resort(submittedData);
+    resort.author = req.user._id;
     await resort.save();
     req.flash('success',"Added resort");
     res.redirect("/resorts");
@@ -48,7 +49,7 @@ router.post("/",isLoggedIn, validateResort,async(req,res,next)=>{
     
 });
 router.get("/:id",catchAsync(async (req,res)=>{
-    const resorts = await Resort.findById(req.params.id);
+    const resorts = await Resort.findById(req.params.id).populate('author');
     if(!resorts){
         req.flash("error","Cannot find the resort");
         res.redirect('/resorts');
@@ -58,7 +59,7 @@ router.get("/:id",catchAsync(async (req,res)=>{
         let x = await Review.findById(y);
         reviewsCollected.push(x);
     }
-    console.log(reviewsCollected)
+    console.log(reviewsCollected,req.user_id);
         res.render("resorts/show",{data:resorts,reviews:reviewsCollected});
 }));
 router.get("/:id/edit",isLoggedIn, catchAsync(async (req,res)=>{
@@ -70,11 +71,21 @@ router.get("/:id/edit",isLoggedIn, catchAsync(async (req,res)=>{
     res.render("resorts/edit",{data:resorts}); 
 }));
 router.put("/:id",isLoggedIn, validateResort,catchAsync(async(req,res)=>{
+    const isPresent = await Resort.findById(req.params.id);
+    if(!isPresent.author.equals(req.user._id) ){
+        req.flash('error','You are not allowed to do that');
+        return res.redirect(`/resorts/${req.params.id}`);
+    }
     const resort = await Resort.findByIdAndUpdate(req.params.id,{title:req.body.resorts.title,location:req.body.resorts.location,description:req.body.resorts.description,image:req.body.resorts.image,price:req.body.resorts.price});
     req.flash('success',`Updated ${req.body.resorts.title}`);
-     res.redirect(`/resorts/${resort._id}`);
+    res.redirect(`/resorts/${resort._id}`);
  }))
 router.delete("/:id",isLoggedIn, catchAsync(async(req,res)=>{
+    const isPresent = await Resort.findById(req.params.id);
+    if(!isPresent.author.equals(req.user._id) ){
+        req.flash('error','You are not allowed to do that');
+        return res.redirect(`/resorts/${req.params.id}`);
+    }
     const resort = await Resort.findByIdAndDelete(req.params.id);
     req.flash('success',`Deleted successfully`);
     res.redirect("/resorts");
