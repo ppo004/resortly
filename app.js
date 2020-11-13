@@ -1,3 +1,6 @@
+if(process.env.NODE_ENV !== "production"){
+    require("dotenv").config();
+}
 /*----------------------------------PACKAGE IMPORTS----------------------------------*/
 const express                            = require("express");
 const path                               = require("path");
@@ -11,6 +14,8 @@ const flash                              = require("connect-flash");
 const passport                           = require("passport");
 const passportLocal                      = require("passport-local");
 const User                               = require("./modules/user");
+const cookieParser                       = require('cookie-parser');
+
 /*----------------------------------MODULES IMPORTS----------------------------------*/
 const ExpressError                       = require("./utils/expressErrors");
 /*----------------------------------ROUTES IMPORTS----------------------------------*/
@@ -49,11 +54,11 @@ app.use(passport.session());
 passport.use(new passportLocal(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+app.use(cookieParser())
 app.use((req,res,next)=>{
     res.locals.currentUser = req.user;
     res.locals.success = req.flash("success");
     res.locals.error   = req.flash("error");
-    res.cookie("count",0);
     next();
 });
 /*----------------------------------ROUTES----------------------------------*/
@@ -61,7 +66,8 @@ app.use("/resorts",resortsRoutes);
 app.use("/resorts/:id/reviews",reviewsRoutes);
 app.use("/",userRoutes);
 app.get("/",(req,res)=>{
-    res.send("<h1>Wilkommen</h1>");
+    console.log(req.cookies.name);
+    res.send(`<h1>Wilkommen</h1>`);
 })
 app.all("*",(req,res,next)=>{
     next(new ExpressError('Page not found',404));
