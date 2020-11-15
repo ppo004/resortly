@@ -9,6 +9,9 @@ const isLoggedIn    = require("../isLoggedinMiddleware");
 const {cloudinary,storage}     = require("../cloudinary/index");
 const multer        = require('multer');
 const upload        = multer({storage});
+const mboxGeoCoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const mboxToken = process.env.Mapbox_PublicToken;
+const geoCoder = mboxGeoCoding({accessToken : mboxToken});
 const validateResort = (req,res,next)=>{
     const resortSchema = Joi.object({
         resorts:Joi.object({
@@ -29,7 +32,6 @@ else{
     next();
 }
 }
-
 router.route('/')
 .get(catchAsync(async (req,res)=>{
     const resorts = await Resort.find({});
@@ -38,8 +40,12 @@ router.route('/')
 .post(isLoggedIn,upload.array('image'), validateResort,async(req,res,next)=>{
     try{
     const submittedData = req.body.resorts;
+    const geo = await geoCoder.forwardGeocode({
+        query:req.body.resorts.location,
+        limit:1
+    }).send();
     let resort = new Resort(submittedData);
-    console.log(req.files);
+    resort.geometry = geo.body.features[0].geometry;
     resort.images = req.files.map((file)=>{
         return {
             url:file.path,
@@ -49,6 +55,7 @@ router.route('/')
     resort.author = req.user._id;
     await resort.save();
     req.flash('success',"Added resort");
+    console.log(resort);
     res.redirect("/resorts");
     }
     catch(error){

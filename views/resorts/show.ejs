@@ -1,5 +1,23 @@
 <% layout('./boilerplate') %> 
 
+<div id='map' style='width: 1100px; height: 300px;'></div>
+<script>
+    const loc = [<%- data.geometry.coordinates%>];
+  mapboxgl.accessToken = 'pk.eyJ1IjoicHBvLTAwNCIsImEiOiJja2Z5cjdmNWIyMGJnMnJzOGY4Z240eHF6In0.yAc9ZUBF4HJ186JDVyBsDQ';
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center:loc,
+    zoom:10
+  });
+  new mapboxgl.Marker().setLngLat([<%- data.geometry.coordinates%>]).addTo(map)
+//   .setPopup(
+//         new mapboxgl.Popup({ offset: 25 })
+//             .setHTML(
+//                 `<h3>${data.title}</h3><p>${data.location}</p>`
+//             )
+//     )
+</script>
 
         <div class="card mb-3">
             <div class="card-body">
@@ -77,4 +95,6 @@
             </div>
         </div>
         </div>
+
+
         
