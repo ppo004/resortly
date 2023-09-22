@@ -1,6 +1,5 @@
 const Resort = require("../modules/resort");
 const Review = require("../modules/review");
-const ExpressError = require("../utils/expressErrors");
 
 const getAllResorts = async () => {
   try {
