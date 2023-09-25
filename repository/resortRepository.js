@@ -86,10 +86,39 @@ const deleteResortById = async (resortId, userId) => {
   }
 };
 
+const addReview = async (resortId, review) => {
+  const resort = getResortById(resortId);
+  if (!resort) {
+    throw new Error('Resort not found');
+  }
+  resort.reviews.push(review);
+  await resort.save();
+}
+
+const deleteReview = async (resortId, reviewId) => {
+  try {
+    const resort = await Resort.findById(resortId);
+    if (!resort) {
+      throw new Error('Resort not found');
+    }
+    const reviewIndex = resort.reviews.indexOf(reviewId);
+    if (reviewIndex === -1) {
+      throw new Error('Review not found in the resort');
+    }
+    resort.reviews.splice(reviewIndex, 1);
+    await resort.save();
+  } catch (error) {
+    throw new Error(`Error deleting review: ${error.message}`);
+  }
+};
+
+
 module.exports = {
   getAllResorts,
   createResort,
   getResortById,
   updateResort,
   deleteResortById,
+  deleteReview,
+  addReview
 };
